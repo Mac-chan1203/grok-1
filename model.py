@@ -331,7 +331,7 @@ class MoELayer(hk.Module):
         )
         def moe_slow_matmul1(input, weight, scales, index, prob):
             weight = weight * scales
-            one_hot_indices = jax.nn.one_hot(index.reshape(-1), 8, axis=0)
+            one_hot_indices = jax.nn.one_hot(index.reshape(-1), self.num_experts, axis=0)
             all_expert_output = jnp.einsum("mk,bkn->bmn", input, weight)
             output = jnp.einsum("bm,bmn->mn", one_hot_indices, all_expert_output)
             return output
@@ -351,7 +351,7 @@ class MoELayer(hk.Module):
         )
         def moe_slow_matmul2(input, weight, scales, index, prob):
             weight = weight * scales
-            one_hot_indices = jax.nn.one_hot(index.reshape(-1), 8, axis=0)
+            one_hot_indices = jax.nn.one_hot(index.reshape(-1), self.num_experts, axis=0)
             all_expert_output = jnp.einsum("mk,bkn->bmn", input, weight)
             output = jnp.einsum("bm,bmn->mn", one_hot_indices, all_expert_output)
             return jax.lax.psum(output, axis_name="model")
